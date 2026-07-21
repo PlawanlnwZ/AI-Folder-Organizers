@@ -4,7 +4,7 @@ from typhoon_ocr import ocr_document
 
 
 def get_downloads_path():
-    return os.path.expanduser("~/Downloads/examplesomething")  # เปลี่ยน Path ตรงนี้ตาม Folder ที่เราอยากจะจัด
+    return os.path.expanduser("~\Downloads")  # เปลี่ยน Path ตรงนี้ตาม Folder ที่เราอยากจะจัด
 
 
 def get_all_files():
