@@ -1,0 +1,1 @@
+SUPPORTED_IMAGE_TYPES = [".png", ".jpg", ".jpeg"]
