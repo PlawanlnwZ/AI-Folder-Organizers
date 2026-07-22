@@ -16,8 +16,8 @@ def ask_ai(prompt):
     if not TYPHOON_API_KEY:
         raise RuntimeError(
             "TYPHOON_API_KEY environment variable is not set. "
-            "Get an API key from https://playground.opentyphoon.ai and set it, e.g.:\n"
-            "  export TYPHOON_API_KEY=your_key_here"
+            "Get an API key from https://playground.opentyphoon.ai and set it in .env files, e.g.:\n"
+            "TYPHOON_API_KEY=your_key_here"
         )
 
     response = requests.post(
