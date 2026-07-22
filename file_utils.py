@@ -4,7 +4,7 @@ from typhoon_ocr import ocr_document
 
 
 def get_downloads_path():
-    return os.path.expanduser("~\Downloads")  # เปลี่ยน Path ตรงนี้ตาม Folder ที่เราอยากจะจัด
+    return os.path.expanduser("~\Onedrive\Documents\examplemessifile")  # เปลี่ยน Path ตรงนี้ตาม Folder ที่เราอยากจะจัด
 
 
 def get_all_files():
@@ -22,15 +22,15 @@ def extract_text_from_image(path):
         return ""
 
 
-def move_file(old_path, new_name, category):
+def move_file(old_path, category):
 
     base_dir = os.path.join(get_downloads_path(), "organized_files")
     category_path = os.path.join(base_dir, category)
 
     os.makedirs(category_path, exist_ok=True)
 
-    ext = os.path.splitext(old_path)[1]
-    new_path = os.path.join(category_path, new_name + ext)
+    original_filename = os.path.basename(old_path)
+    new_path = os.path.join(category_path, original_filename)
 
     shutil.move(old_path, new_path)
 

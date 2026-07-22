@@ -19,9 +19,9 @@ def process_file(file_path):
     if ext in SUPPORTED_IMAGE_TYPES:
         content = extract_text_from_image(file_path)
 
-    new_name, category = analyze_file(filename, content)
+    category = analyze_file(filename, content)
 
-    move_file(file_path, new_name, category)
+    move_file(file_path, category)
 
 
 def main():

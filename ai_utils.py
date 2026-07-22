@@ -83,33 +83,26 @@ def analyze_file(filename, content=""):
     Then decide:
 
     Category: <category>
-    Filename: <clean filename>
 
     Return ONLY:
     Category: ...
-    Filename: ...
     """
 
     result = ask_ai(prompt)
 
-    name = "unknown"
     category = "Other"
 
     for line in result.split("\n"):
         line = line.strip().lower()
-
-        if line.startswith("filename:"):
-            name = line.split("filename:")[1].strip()
-
+        
         if line.startswith("category:"):
             category = line.split("category:")[1].strip()
 
     memory.append({
         "original": filename,
         "category": category,
-        "new_name": name
     })
 
     save_memory(memory)
 
-    return name, category
+    return category
