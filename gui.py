@@ -19,10 +19,26 @@ from ai_utils import analyze_file, save_memory
 from config import SUPPORTED_IMAGE_TYPES
 from file_utils_gui import get_files_in_folder, extract_text_from_image, move_file
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class FileOrganizerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        # Set Title
+        self.title("File Organizer")
+        self.geometry("800x600")
+
+        # Set Window Titlebar Icon
+        self.iconbitmap(resource_path("logo.ico"))
 
         # ── Window setup ──────────────────────────────────────────────────────
         self.title("File Organizer")
