@@ -79,7 +79,7 @@ def analyze_file(filename, content=""):
     1. What type of file is this?
     2. What is its purpose?
     3. What would be a consistent category based on past decisions?
-    4. What would be the best choice of Category name to make the Folder more specific?
+    
     Then decide:
 
     Category: <category>

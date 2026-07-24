@@ -260,10 +260,7 @@ class FileOrganizerApp(ctk.CTk):
 
     def _clear_memory(self):
         try:
-            with open("exmemo.json", "r", encoding="utf-8") as f:
-                exmemo = json.load(f)
-                
-            save_memory(exmemo)
+            save_memory([])
             self._log("Memory cleared.")
             messagebox.showinfo("Success", "AI memory has been cleared.")
         except Exception as e:
