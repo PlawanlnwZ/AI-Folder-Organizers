@@ -5,6 +5,7 @@ import time
 import os
 import sys
 import queue
+import json
 
 # ── Import original AI modules ────────────────────────────────────────────────
 # Try relative to this file first, then fallback to the uploaded path
@@ -259,7 +260,10 @@ class FileOrganizerApp(ctk.CTk):
 
     def _clear_memory(self):
         try:
-            save_memory([])
+            with open("exmemo.json", "r", encoding="utf-8") as f:
+                exmemo = json.load(f)
+                
+            save_memory(exmemo)
             self._log("Memory cleared.")
             messagebox.showinfo("Success", "AI memory has been cleared.")
         except Exception as e:
