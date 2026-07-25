@@ -55,7 +55,7 @@ class FileOrganizerApp(ctk.CTk):
         super().__init__()
 
         # ── Window setup ──────────────────────────────────────────────────────
-        self.title("File Organizer")
+        self.title("Folder Organizer")
         self.geometry("850x620")
         self.minsize(700, 500)
 
