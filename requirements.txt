@@ -3,3 +3,4 @@ python-dotenv
 typhoon-ocr
 pillow
 customtkinter
+keyring

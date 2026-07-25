@@ -1,14 +1,29 @@
-import customtkinter as ctk
-from tkinter import filedialog, messagebox
-import threading
-import time
 import os
 import sys
+import time
 import queue
-import json
+import threading
+import keyring
+import customtkinter as ctk
+from tkinter import filedialog, messagebox
 
-# ── Import original AI modules ────────────────────────────────────────────────
-# Try relative to this file first, then fallback to the uploaded path
+# ── 1. Fix output streams for PyInstaller (--noconsole mode) ─────────────────
+if getattr(sys, "frozen", False):
+    sys.stdout = open(os.devnull, "w")
+    sys.stderr = open(os.devnull, "w")
+
+
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller."""
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+# ── 2. Module Imports ────────────────────────────────────────────────────────
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 _upload_dir = os.path.join(_script_dir, "..", "mnt", "agents", "upload")
 for p in (_script_dir, _upload_dir, "/mnt/agents/upload"):
@@ -19,26 +34,25 @@ from ai_utils import analyze_file, save_memory
 from config import SUPPORTED_IMAGE_TYPES
 from file_utils_gui import get_files_in_folder, extract_text_from_image, move_file
 
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
+# ── 3. Keyring Constants ─────────────────────────────────────────────────────
+SERVICE_NAME = "AIFolderOrganizer"
+KEY_NAME = "api_key"
 
-    return os.path.join(base_path, relative_path)
 
+def get_saved_api_key():
+    """Retrieves stored API key from Windows Vault / macOS Keychain."""
+    return keyring.get_password(SERVICE_NAME, KEY_NAME)
+
+
+def save_api_key(api_key):
+    """Saves API key securely in Windows Vault / macOS Keychain."""
+    keyring.set_password(SERVICE_NAME, KEY_NAME, api_key.strip())
+
+
+# ── 4. Main Application Window ───────────────────────────────────────────────
 class FileOrganizerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        
-        # Set Title
-        self.title("File Organizer")
-        self.geometry("800x600")
-
-        # Set Window Titlebar Icon
-        self.iconbitmap(resource_path("logo.ico"))
 
         # ── Window setup ──────────────────────────────────────────────────────
         self.title("File Organizer")
@@ -48,6 +62,12 @@ class FileOrganizerApp(ctk.CTk):
         ctk.set_appearance_mode("System")
         ctk.set_default_color_theme("dark-blue")
 
+        # Set Window Titlebar Icon if available
+        try:
+            self.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
         # ── State ─────────────────────────────────────────────────────────────
         self.target_folder = ctk.StringVar(value="")
         self.is_monitoring = False
@@ -55,8 +75,76 @@ class FileOrganizerApp(ctk.CTk):
         self.stop_event = threading.Event()
         self.log_queue = queue.Queue()
 
+        # Build UI and initialize key check
         self._build_ui()
         self._process_log_queue()
+
+        # Prompt user on startup if no API Key is saved
+        self.after(200, self._ensure_api_key)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    #  API Key Management
+    # ═════════════════════════════════════════════════════════════════════════
+    def _ensure_api_key(self):
+        """Checks if an API key exists. Prompt user if missing."""
+        if not get_saved_api_key():
+            self._prompt_api_key_dialog()
+
+    def _prompt_api_key_dialog(self, is_update=False):
+        """Creates a modal popup window for the user to input/update API Key."""
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("API Key Configuration" if is_update else "Welcome - Enter API Key")
+        dialog.geometry("450x230")
+        dialog.resizable(False, False)
+
+        # Force focus on popup
+        dialog.transient(self)
+        dialog.grab_set()
+
+        ctk.CTkLabel(
+            dialog,
+            text="🔑 Enter Your Typhoon API Key",
+            font=ctk.CTkFont(size=18, weight="bold")
+        ).pack(pady=(20, 5))
+
+        ctk.CTkLabel(
+            dialog,
+            text="Key is saved safely in Windows Vault / Keychain.",
+            font=ctk.CTkFont(size=12),
+            text_color="gray"
+        ).pack(pady=(0, 15))
+
+        key_entry = ctk.CTkEntry(
+            dialog,
+            placeholder_text="sk-...",
+            width=360,
+            show="*"
+        )
+        key_entry.pack(pady=5)
+
+        current_key = get_saved_api_key()
+        if is_update and current_key:
+            key_entry.insert(0, current_key)
+
+        def save_and_close():
+            key = key_entry.get().strip()
+            if not key:
+                messagebox.showwarning("Warning", "API Key cannot be empty!", parent=dialog)
+                return
+
+            save_api_key(key)
+            self._log("API Key updated successfully.")
+            dialog.destroy()
+            messagebox.showinfo("Success", "API Key saved securely!", parent=self)
+
+        ctk.CTkButton(
+            dialog,
+            text="Save Key",
+            width=120,
+            command=save_and_close
+        ).pack(pady=15)
+
+        self.wait_window(dialog)
 
     # ═════════════════════════════════════════════════════════════════════════
     #  UI Construction
@@ -122,26 +210,39 @@ class FileOrganizerApp(ctk.CTk):
         self.start_btn = ctk.CTkButton(
             ctrl_card,
             text="▶  Start Monitoring",
-            width=170,
+            width=160,
             height=38,
             command=self._toggle_monitoring,
-            fg_color="#10b981",        # emerald-500
-            hover_color="#059669",     # emerald-600
+            fg_color="#10b981",  # emerald-500
+            hover_color="#059669",  # emerald-600
             font=ctk.CTkFont(size=13, weight="bold"),
         )
-        self.start_btn.pack(side="left", padx=(15, 10), pady=12)
+        self.start_btn.pack(side="left", padx=(15, 8), pady=12)
 
         self.clear_btn = ctk.CTkButton(
             ctrl_card,
             text="🗑  Clear Memory",
-            width=170,
+            width=140,
             height=38,
             command=self._clear_memory,
-            fg_color="#ef4444",        # red-500
-            hover_color="#dc2626",     # red-600
+            fg_color="#ef4444",  # red-500
+            hover_color="#dc2626",  # red-600
             font=ctk.CTkFont(size=13, weight="bold"),
         )
-        self.clear_btn.pack(side="left", padx=(0, 15), pady=12)
+        self.clear_btn.pack(side="left", padx=(0, 8), pady=12)
+
+        # Button to allow setting/updating API key anytime
+        self.key_btn = ctk.CTkButton(
+            ctrl_card,
+            text="🔑  API Key",
+            width=110,
+            height=38,
+            command=lambda: self._prompt_api_key_dialog(is_update=True),
+            fg_color="#3b82f6",  # blue-500
+            hover_color="#2563eb",  # blue-600
+            font=ctk.CTkFont(size=13, weight="bold"),
+        )
+        self.key_btn.pack(side="left", padx=(0, 15), pady=12)
 
         self.status_label = ctk.CTkLabel(
             ctrl_card,
@@ -172,7 +273,7 @@ class FileOrganizerApp(ctk.CTk):
         self.log_box.grid(row=1, column=0, sticky="nsew", padx=15, pady=(0, 12))
 
     # ═════════════════════════════════════════════════════════════════════════
-    #  Actions
+    #  Actions & Processing
     # ═════════════════════════════════════════════════════════════════════════
     def _browse_folder(self):
         folder = filedialog.askdirectory()
@@ -208,6 +309,11 @@ class FileOrganizerApp(ctk.CTk):
             return
         if not os.path.isdir(folder):
             messagebox.showerror("Invalid Path", "The selected folder does not exist.")
+            return
+
+        if not get_saved_api_key():
+            messagebox.showwarning("Missing API Key", "Please configure your API Key before starting.")
+            self._prompt_api_key_dialog()
             return
 
         self.is_monitoring = True

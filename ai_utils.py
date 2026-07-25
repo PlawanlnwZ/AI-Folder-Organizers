@@ -1,9 +1,28 @@
 import requests
 import json
 import os
+import keyring
 from dotenv import load_dotenv
  
 load_dotenv()
+
+SERVICE_NAME = "AIFolderOrganizer"
+KEY_NAME = "api_key"
+
+def get_saved_api_key():
+    """Retrieves the stored API key from Windows Credential Manager / Keychain."""
+    return keyring.get_password(SERVICE_NAME, KEY_NAME)
+
+def save_api_key(api_key):
+    """Saves the API key securely into Windows Credential Manager / Keychain."""
+    keyring.set_password(SERVICE_NAME, KEY_NAME, api_key.strip())
+
+def delete_api_key():
+    """Deletes the saved API key if requested."""
+    try:
+        keyring.delete_password(SERVICE_NAME, KEY_NAME)
+    except keyring.errors.PasswordDeleteError:
+        pass
 
 TYPHOON_API_URL = "https://api.opentyphoon.ai/v1/chat/completions"
 TYPHOON_MODEL = "typhoon-v2.5-30b-a3b-instruct"
