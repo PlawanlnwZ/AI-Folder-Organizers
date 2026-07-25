@@ -1,43 +1,27 @@
-import requests
 import json
 import os
-from dotenv import load_dotenv
- 
-load_dotenv()
+from llama_cpp import Llama
 
-TYPHOON_API_URL = "https://api.opentyphoon.ai/v1/chat/completions"
-TYPHOON_MODEL = "typhoon-v2.5-30b-a3b-instruct"
-TYPHOON_API_KEY = os.environ.get("TYPHOON_API_KEY")
 
+MODEL_PATH = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
 MEMORY_FILE = "memory.json"
+
+llm = Llama(
+    model_path=MODEL_PATH,
+    n_ctx=2048,
+    verbose=False  
+)
 
 
 def ask_ai(prompt):
-    if not TYPHOON_API_KEY:
-        raise RuntimeError(
-            "TYPHOON_API_KEY environment variable is not set. "
-            "Get an API key from https://playground.opentyphoon.ai and set it in .env files, e.g.:\n"
-            "TYPHOON_API_KEY=your_key_here"
-        )
-
-    response = requests.post(
-        TYPHOON_API_URL,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {TYPHOON_API_KEY}",
-        },
-        json={
-            "model": TYPHOON_MODEL,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "max_tokens": 512,
-            "temperature": 0.3,
-            "stream": False,
-        },
+    response = llm.create_chat_completion(
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=512,
+        temperature=0.3,
     )
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
+    return response["choices"][0]["message"]["content"]
 
 
 def load_memory():
@@ -94,7 +78,7 @@ def analyze_file(filename, content=""):
 
     for line in result.split("\n"):
         line = line.strip().lower()
-        
+
         if line.startswith("category:"):
             category = line.split("category:")[1].strip()
 

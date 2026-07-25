@@ -6,4 +6,11 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "customtkinter>=6.0.0",
+    "llama-cpp-python>=0.3.34",
+    "pillow>=12.3.0",
+    "pyinstaller>=6.21.0",
+    "pytesseract>=0.3.13",
+    "python-dotenv>=1.2.2",
+    "requests>=2.34.2",
+    "typhoon-ocr>=0.4.1",
 ]

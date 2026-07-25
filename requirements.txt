@@ -1,5 +1,6 @@
 requests
-python-dotenv
-typhoon-ocr
 pillow
 customtkinter
+llama-cpp-python
+pyinstaller
+typhoon-ocr
