@@ -2,3 +2,4 @@ requests
 pillow
 customtkinter
 keyring
+typhoon-ocr

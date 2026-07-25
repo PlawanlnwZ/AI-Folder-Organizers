@@ -59,11 +59,6 @@ class FileOrganizerApp(ctk.CTk):
         self.geometry("850x620")
         self.minsize(700, 500)
 
-        # Set Window Titlebar Icon if icon file exists
-        icon_p = resource_path("logo.ico")
-        if os.path.exists(icon_p):
-            self.iconbitmap(icon_p)
-
         ctk.set_appearance_mode("System")
         ctk.set_default_color_theme("dark-blue")
 
@@ -83,7 +78,6 @@ class FileOrganizerApp(ctk.CTk):
         # Build UI and initialize key check
         self._build_ui()
         self._process_log_queue()
-        self._log("AI Engine Ready.")
 
         # Prompt user on startup if no API Key is saved
         self.after(200, self._ensure_api_key)
@@ -159,14 +153,14 @@ class FileOrganizerApp(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        # Title Frame
+        # ── Title ───────────────────────────────────────────────────────────
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
         title_frame.grid(row=0, column=0, sticky="ew", padx=25, pady=(25, 5))
         title_frame.grid_columnconfigure(0, weight=1)
 
         ctk.CTkLabel(
             title_frame,
-            text="🗂️ File Organizer",
+            text="🗂️  File Organizer",
             font=ctk.CTkFont(size=26, weight="bold"),
         ).grid(row=0, column=0, sticky="w")
 
@@ -177,7 +171,7 @@ class FileOrganizerApp(ctk.CTk):
             text_color="gray",
         ).grid(row=1, column=0, sticky="w", pady=(2, 0))
 
-        # Folder Selection
+        # ── Folder Selection ──────────────────────────────────────────────────
         folder_card = ctk.CTkFrame(self)
         folder_card.grid(row=1, column=0, sticky="ew", padx=25, pady=(20, 10))
         folder_card.grid_columnconfigure(0, weight=1)
@@ -209,7 +203,7 @@ class FileOrganizerApp(ctk.CTk):
             command=self._browse_folder,
         ).grid(row=0, column=1)
 
-        # Controls
+        # ── Controls ──────────────────────────────────────────────────────────
         ctrl_card = ctk.CTkFrame(self)
         ctrl_card.grid(row=2, column=0, sticky="ew", padx=25, pady=(0, 10))
 
@@ -258,7 +252,7 @@ class FileOrganizerApp(ctk.CTk):
         )
         self.status_label.pack(side="right", padx=15)
 
-        # Log Console
+        # ── Log Console ───────────────────────────────────────────────────────
         log_card = ctk.CTkFrame(self)
         log_card.grid(row=3, column=0, sticky="nsew", padx=25, pady=(0, 20))
         log_card.grid_columnconfigure(0, weight=1)
@@ -325,7 +319,7 @@ class FileOrganizerApp(ctk.CTk):
         self.is_monitoring = True
         self.stop_event.clear()
         self.start_btn.configure(
-            text="⏹ Stop Monitoring",
+            text="⏹  Stop Monitoring",
             fg_color="#ef4444",
             hover_color="#dc2626",
         )
@@ -341,7 +335,7 @@ class FileOrganizerApp(ctk.CTk):
         self.is_monitoring = False
         self.stop_event.set()
         self.start_btn.configure(
-            text="▶ Start Monitoring",
+            text="▶  Start Monitoring",
             fg_color="#10b981",
             hover_color="#059669",
         )
