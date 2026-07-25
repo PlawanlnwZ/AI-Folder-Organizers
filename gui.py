@@ -160,7 +160,7 @@ class FileOrganizerApp(ctk.CTk):
 
         ctk.CTkLabel(
             title_frame,
-            text="🗂️  File Organizer",
+            text="🗂️ Folder Organizer",
             font=ctk.CTkFont(size=26, weight="bold"),
         ).grid(row=0, column=0, sticky="w")
 
