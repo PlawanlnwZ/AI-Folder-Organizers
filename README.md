@@ -33,7 +33,7 @@
 
 Managing local files is a notoriously tedious task. Traditional auto-organizers rely on rigid, rule-based file extension rules (like dumping every .pdf into "Documents") or complex regular expressions, completely ignoring context and intent.
 
-AI Folder Organizer replaces hardcoded rules with intelligent, context-aware file sorting powered by Prompt Engineering and Past Decision Tracking. Instead of guessing based on extensions, it reads file context, learns your personal organizational habits, and seamlessly places files where they truly belong.
+AI Folder Organizer replaces hardcoded rules with intelligent, context-aware file sorting powered by Prompt Engineering and Past Decision Tracking. Instead of guessing based on extensions, it reads file context and places files where they truly belong.
 
 ### Built With
 
