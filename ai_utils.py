@@ -3,9 +3,7 @@ import os
 import sys
 import requests
 import keyring
-from dotenv import load_dotenv
 
-load_dotenv()
 
 # ── Keyring & API Config ───────────────────────────────────────────────────
 SERVICE_NAME = "AIFolderOrganizer"

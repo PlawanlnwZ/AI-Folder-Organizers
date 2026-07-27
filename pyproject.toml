@@ -7,5 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "customtkinter>=6.0.0",
     "keyring>=25.7.0",
+    "pillow>=12.3.0",
+    "requests>=2.34.2",
     "typhoon-ocr>=0.4.1",
 ]
