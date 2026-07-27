@@ -8,7 +8,7 @@
   <h3 align="center">AI Folder Organizer</h3>
 
   <p align="center">
-    A LLM based-simple folder organization AI model
+    LLM based-simple folder organization AI model
     <br />
     <br />
     <a href="https://www.mediafire.com/file/pmp6i8tlw4i0v68/AI_Folder_Organizer.exe/file"><strong>📥 Download Latest Release</strong></a>
